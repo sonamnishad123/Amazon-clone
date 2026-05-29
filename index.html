@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Clone Website</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f3f3f3; color: #0f1111; font-size: 14px; }
+        
+        .header { background-color: #131921; color: white; position: sticky; top: 0; z-index: 100; }
+        .header-inner, .top-controls, .nav { display: flex; align-items: center; padding: 10px 20px; gap: 20px; }
+        .logo { font-size: 26px; font-weight: bold; color: #f08804; cursor: pointer; }
+        .account { font-size: 12px; cursor: pointer; }
+        
+        .search-area { display: flex; flex: 1; height: 40px; border-radius: 4px; overflow: hidden; }
+        .search-box { flex: 1; padding: 10px; border: none; outline: none; font-size: 15px; }
+        .search-btn { padding: 0 15px; background-color: #febd69; border: none; cursor: pointer; font-size: 16px; }
+        .search-btn:hover { background-color: #f3a847; }
+
+        .nav { background-color: #232f3e; padding: 12px 20px; }
+        .nav a { color: white; text-decoration: none; margin-right: 15px; font-size: 14px; }
+        .nav a:hover { text-decoration: underline; }
+        .top-controls { justify-content: space-between; background: white; border-bottom: 1px solid #ddd; }
+        #priceFilter { padding: 8px; border-radius: 4px; font-size: 14px; }
+        .cart-box { font-size: 18px; font-weight: bold; cursor: pointer; }
+        #cart-count { background: #f08804; color: white; padding: 2px 8px; border-radius: 20px; margin-left: 2px; }
+
+        .banner img { width: 100%; display: block; max-height: 400px; object-fit: cover; }
+        .categories, .products { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; padding: 20px; }
+        
+        .category, .product { background-color: white; border: 1px solid #ddd; padding: 15px; text-align: center; border-radius: 4px; transition: transform 0.2s; }
+        .category { width: 240px; text-decoration: none; color: black; }
+        .category:hover, .product:hover { border-color: #f08804; transform: translateY(-2px); }
+        
+        .category img, .product img { width: 100%; height: 180px; object-fit: contain; background: #fff; }
+        .product h3 { font-size: 16px; margin: 12px 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product p { color: #b12704; font-weight: bold; font-size: 18px; margin-bottom: 10px; }
+        
+        .product button, .popup-content button { background-color: #ffd814; border: 1px solid #fcd200; border-radius: 20px; padding: 10px; cursor: pointer; font-weight: bold; width: 100%; transition: background 0.2s; }
+        .product button:hover { background-color: #f7ca00; }
+
+        .popup { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .popup-content { background: white; padding: 30px; width: 320px; text-align: center; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .popup-content input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; }
+        .popup-content button { margin-top: 8px; }
+        .close-btn { background-color: #e7e9ec !important; border: 1px solid #adb1b8 !important; }
+
+        .footer { background-color: #131921; color: white; text-align: center; padding: 20px; margin-top: 30px; }
+
+        @media screen and (max-width: 768px) {
+            .header-inner { flex-direction: column; align-items: stretch; gap: 10px; }
+            .account { text-align: center; }
+            .category, .product { width: 45%; }
+        }
+        @media screen and (max-width: 480px) {
+            .category, .product { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-inner">
+            <div class="logo" onclick="window.location.href='index.html';">amazon</div>
+            <div class="search-area">
+                <input type="text" id="searchInput" class="search-box" placeholder="Search Amazon products...">
+                <button class="search-btn" onclick="searchProducts()">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+            <div class="account" onclick="openPopup()">
+                <span id="welcome-text">Hello, Sign in</span><br>
+                <b>Account & Lists</b>
+            </div>
+        </div>
+    </div>
+
+    <div class="top-controls">
+        <select id="priceFilter" onchange="filterProducts()">
+            <option value="all">All Products</option>
+            <option value="low">Below ₹1,000</option>
+            <option value="mid">₹1,000 - ₹10,000</option>
+            <option value="high">Above ₹10,000</option>
+        </select>
+
+        <div class="cart-box">
+            <i class="fa-solid fa-cart-shopping"></i> Cart:
+            <span id="cart-count">0</span>
+        </div>
+    </div>
+
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="fruitnvegitable.html">Fruit & Vegetables</a>
+        <a href="electronics.html">Electronics</a>
+        <a href="fashion.html">Fashion</a>
+        <a href="homenkitchen.html">Home & Kitchen</a>
+    </nav>
+
+    <div class="banner">
+        <img src="https://m.media-amazon.com/images/G/31/img20/AmazonLaunchpad/2022/Jupiter/phase2/gateway/phase4/Fashion--accessories_PC.jpg" alt="Promo Banner">
+    </div>
+
+    <div class="categories">
+        <a href="fruitnvegitable.html" class="category">
+            <img src="https://assets.aboutamazon.com/dims4/default/b0cc94c/2147483647/strip/true/crop/1279x720+0+0/resize/2480x1396!/format/webp/quality/90/?url=https%3A%2F%2Famazon-blogs-brightspot.s3.amazonaws.com%2Ff5%2F9f%2F43fe106c4a5081e7a696ef0a8fa8%2Ffresh-1280x7201.jpg" alt="Fruits">
+            <h3>Fruit & Vegetables</h3>
+        </a>
+        <a href="electronics.html" class="category">
+            <img src="https://channelx.world/wp-content/uploads/2024/03/Amazon-Consumer-Electronics-shortened-Returns-window-shutterstock_738107467.jpg" alt="Electronics">
+            <h3>Electronics</h3>
+        </a>
+        <a href="fashion.html" class="category">
+            <img src="https://assets.aboutamazon.com/dims4/default/d7b943e/2147483647/strip/true/crop/5532x3114+0+287/resize/2480x1396!/format/webp/quality/90/?url=https%3A%2F%2Famazon-blogs-brightspot.s3.amazonaws.com%2F25%2F8e%2F5d7089c64db89a885fb9cd6b9a7f%2Faviv-rachmadian-7f7kehj72mq-unsplash.jpg" alt="Fashion">
+            <h3>Fashion</h3>
+        </a>
+        <a href="homenkitchen.html" class="category">
+            <img src="https://m.media-amazon.com/images/I/614I1HYPQsL.jpg" alt="Home/Kitchen">
+            <h3>Home & Kitchen</h3>
+        </a>
+    </div>
+
+    <div class="products" id="productGrid">
+    </div>
+
+    <div id="loginPopup" class="popup">
+        <div class="popup-content">
+            <h2>Sign In</h2>
+            <input type="text" id="username" placeholder="Enter your name">
+            <button onclick="loginUser()">Sign In</button>
+            <button class="close-btn" onclick="closePopup()">Cancel</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2026 Amazon Clone
+    </div>
+    <script>
+        const database = [
+            { id: 1, name: "Wireless Mouse", price: 2499, tag: "low", img: "https://www.redragon.in/cdn/shop/files/Main_d733c563-7c27-4ed4-a778-c8860fdb26a5.png?v=1748945785&width=1000" },
+            { id: 2, name: "Winter Sweater", price: 299, tag: "low", img: "https://24thspoke.in/cdn/shop/files/1723225434788.jpg?v=1723225463&width=1200" },
+            { id: 3, name: "Premium Fridge", price: 60499, tag: "high", img: "https://www.electrolux.in/contentassets/5f8b4b50a99649cba7721d1efdbe6e26/imageypyy.png" },
+            { id: 4, name: "High Heels Sandals", price: 1299, tag: "mid", img: "https://images-cdn.ubuy.co.in/66b62d92440d2e6a4f056876-women-shoes-ladies-fashion-open-toe.jpg" }
+        ];
+
+        let cartCounterValue = 0;
+
+        function renderItems(itemArray) {
+            const grid = document.getElementById("productGrid");
+            grid.innerHTML = ""; 
+            
+            if(itemArray.length === 0) {
+                grid.innerHTML = "<p style='padding:40px;color:#666;'>No products found matching your search parameters.</p>";
+                return;
+            }
+
+            itemArray.forEach(product => {
+                grid.innerHTML += `
+                    <div class="product">
+                        <img src="${product.img}" alt="${product.name}">
+                        <h3>${product.name}</h3>
+                        <p>₹${product.price.toLocaleString('en-IN')}</p>
+                        <button onclick="addToCart('${product.name.replace(/'/g, "\\'")}')">Add to Cart</button>
+                    </div>
+                `;
+            });
+        }
+
+        function addToCart(itemName) {
+            cartCounterValue++;
+            document.getElementById("cart-count").innerText = cartCounterValue;
+            alert(`"${itemName}" has been added to your shopping cart!`);
+        }
+
+        function filterProducts() {
+            const selectiveValue = document.getElementById("priceFilter").value;
+            if (selectiveValue === "all") {
+                renderItems(database);
+            } else {
+                const filtered = database.filter(item => item.tag === selectiveValue);
+                renderItems(filtered);
+            }
+        }
+
+        function searchProducts() {
+            const query = document.getElementById("searchInput").value.toLowerCase().trim();
+            const matchingResults = database.filter(item => item.name.toLowerCase().includes(query));
+            renderItems(matchingResults);
+        }
+
+        function openPopup() { document.getElementById("loginPopup").style.display = "flex"; }
+        function closePopup() { document.getElementById("loginPopup").style.display = "none"; }
+        
+        function loginUser() {
+            const userString = document.getElementById("username").value.trim();
+            if(userString) {
+                document.getElementById("welcome-text").innerText = `Hello, ${userString}`;
+                closePopup();
+            } else {
+                alert("Please insert a valid username.");
+            }
+        }
+
+        window.onload = () => { renderItems(database); };
+    </script>
+</body>
+</html>
